@@ -64,15 +64,9 @@ openstack coe cluster template create k8s-mattermost-template \
     --dns-nameserver 8.8.8.8 \
     --master-flavor m1.k8s-master \
     --flavor m1.k8s-worker \
-    --docker-volume-size 30 \
+    --docker-volume-size 50 \
     --network-driver calico \
     --coe kubernetes \
-    --volume-driver cinder \
-    --labels cinder_csi_enabled=true,\
-    cinder_csi_plugin_tag=v1.24.6,\
-    keystone_auth_enabled=true,\
-    k8s_keystone_auth_tag=v1.24.6
-
 
 # --- Verification ---
 # List the created cluster templates to confirm success.
