@@ -168,7 +168,7 @@ pc.defineParameter(
 pc.defineParameter(
     "hwType", "Hardware Type",
     portal.ParameterType.NODETYPE,
-    "d710", # Default to d430 nodes.
+    "d430", # Default to d430 nodes.
     longDescription="Specify a hardware type for all nodes. Clear Selection for any available type."
 )
 
@@ -238,6 +238,7 @@ for i in range(params.computeNodeCount):
         node.hardware_type = params.hwType
     
     # Add the compute node to the LAN.
+    node.routable_control_ip = True
     iface_compute = node.addInterface("if0")
     lan.addInterface(iface_compute)
     
