@@ -1,0 +1,30 @@
+apiVersion: installation.mattermost.com/v1beta1
+kind: Mattermost
+metadata:
+  name: mattermost
+  namespace: mattermost
+spec:
+  version: 11.0.4
+  size: 50users
+  replicas: 1
+  ingress:
+    enabled: true
+    host: mattermost.192.168.100.220.nip.io  # Keep your existing NodePort host
+    ingressClass: nginx
+    tls:
+      secretName: mattermost-tls              # Your TLS secret
+  database:
+    external:
+      secret: mattermost-mattermost-team-edition-mattermost-dbsecret  # Preserve your current DB secret
+  fileStore:
+    externalVolume:
+      volumeClaimName: mattermost-filestore-pvc
+  scheduling:
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
+      limits:
+        cpu: "2000m"
+        memory: "2Gi"
+  licenseSecret: "mattermost-license"

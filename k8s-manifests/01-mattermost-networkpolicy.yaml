@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mattermost-restrict
+  namespace: mattermost
+spec:
+  podSelector:
+    matchLabels:
+      app: mattermost-team-edition
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: ingress-nginx
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: mattermost-mysql
