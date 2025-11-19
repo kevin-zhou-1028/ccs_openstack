@@ -10,9 +10,9 @@ The deployment includes:
 ## k8s cluster troubleshoot
 ### Note:
 The default template has some issues with pulling many required images to create system wide pods. 
-Adding labels to the template result in kube_master creation failure
-Therefore, we need manually patch these pods after cluster creation
-Use the following command to examine, update, and patch pods after ssh in to the mater node
+Adding labels to the template results in kube_master creation failure.
+Therefore, we need manually patch these pods after cluster creation.
+Use the following command to examine, update, and patch pods after ssh in to the master node
 ```bash
 # Command to check pods health status
 kubectl -n kube-system get pods -o wide
@@ -24,7 +24,7 @@ kubectl -n kube-system set image ds/openstack-cloud-controller-manager \
 kubectl -n kube-system set image ds/k8s-keystone-auth \
   k8s-keystone-auth=docker.io/k8scloudprovider/k8s-keystone-auth:v1.18.0
 
-# Use the code to examine DaemonSets roll out status
+# Examine DaemonSets roll out status
 kubectl -n kube-system rollout status ds/openstack-cloud-controller-manager
 kubectl -n kube-system rollout status ds/k8s-keystone-auth
 
@@ -58,8 +58,7 @@ kubectl get nodes -o wide
 # Get nginx port mapping
 kubectl get svc -n ingress-nginx
 
-# Update the ip address in k8s-manifests/values.yaml to external IP of worker node
-# and port mapped to 80 or 443. Use port mapped to 80 is TLS is not enabled.
+# Update the ip address in k8s-manifests/values.yaml to external IP of worker node and port mapped to 80 or 443. Use port mapped to 80 if TLS is not enabled.
 ```
 
 
@@ -67,14 +66,14 @@ kubectl get svc -n ingress-nginx
 ---
 #### Note: current deployment does not have dynamic volume provisioner in place. Therefore, we need to manually create persistent volume for Mattermost. 
 ```bash
-# Pick a node to host data, run the following command to label the node, replace <NODE_NAME> with the worker node's name.
+# Pick worker node to host data, run the following command to label the node, replace <NODE_NAME> with the worker node's name.
 kubectl get nodes -o wide
 kubectl label node <NODE_NAME> storage=mattermost --overwrite
 
-# SSH into the worker node to manually prepare directories for matter, you can choose any folder but we picked /mnt folder because it's guranteed to be clean to write
-# Do note write to /var because linux write system files to it and mattermost will refuse to bind if the directory is not empty. Manually clearing the directory won't work
+# SSH into the worker node to manually prepare directories for mattermost, we picked /mnt folder because it's guranteed to be clean to write
+# Do note write to /var because linux write system files to it and mattermost will refuse to bind if the directory is not empty. Manually clearing the directory won't work. I tried =..(
 
-ssh -i ~/.ssh/mykey core@<worker-node-ip> # <-- do this in the shell, password is 0000
+ssh -i ~/.ssh/mykey core@<worker-node-ip>
 sudo mkdir -p /mnt/mattermost/app /mnt/mattermost/plugins /mnt/mattermost/mysql
 sudo chmod -R 0777 /mnt/mattermost
 
@@ -134,13 +133,20 @@ kubectl delete -f 03-mm-pv-mysql.yaml -n mattermost
 ### Step 3: Access Mattermost
 
 ```bash
-# Get the access URL
-kubectl get svc -n ingress-nginx ingress-nginx-controller 
-# Access Mattermost at: http://mattermost.${INGRESS_IP}.nip.io"
+# Get the access URL. We couldn't make it to have internet access so use curl to prove connect indirectly
+
+# HTTP
+curl -i "http://<Worker Node IP>:<Port Mappted to 80>/" -H 'Host: mattermost.<Worker Node IP>.nip.io'
+
+# HTTPS, use --insecure due to self-signed certificate
+curl -i "http://<Worker Node IP>:<Port Mappted to 443>/" -H 'Host: mattermost.<Worker Node IP>.nip.io' --insecure
 
 # Check deployment status
 kubectl get mattermost -n mattermost
 kubectl describe mattermost -n mattermost mattermost
+
+# Get port mapping
+kubectl get svc -n ingress-nginx
 ```
 
 ## Troubleshooting
@@ -176,10 +182,3 @@ kubectl delete namespace mattermost
 helm uninstall nginx-ingress -n ingress-nginx
 kubectl delete namespace ingress-nginx
 ```
-
-## Additional Resources
-
-- [Mattermost Kubernetes Documentation](https://docs.mattermost.com/deployment-guide/server/deploy-kubernetes.html)
-- [Mattermost Operator GitHub](https://github.com/mattermost/mattermost-operator)
-- [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/)
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
