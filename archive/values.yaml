@@ -1,0 +1,29 @@
+config:
+  SiteURL: http://mattermost.10.0.0.13.nip.io
+  # MattermostDB: "postgres://mattermost:chocolateFrog!@postgres.mattermost.svc.cluster.local:5432/mattermost?sslmode=disable"
+
+mysql:
+  enabled: false
+
+externalDB:
+  enabled: true
+  externalDriverType: postgres
+  externalConnectionString: "mattermost:chocolateFrog!@postgres.mattermost.svc.cluster.local:5432/mattermost?sslmode=disable"
+
+persistence:
+  enabled: true
+
+  data:
+    size: 10Gi
+    storageClass: "manual"
+
+  plugins:
+    size: 5Gi
+    storageClass: "manual"
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - mattermost.10.0.0.13.nip.io
+  tls: []

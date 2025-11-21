@@ -1,0 +1,38 @@
+# Mattermost Installation Manifest
+# This is a template - replace ${INGRESS_IP} with your actual LoadBalancer IP
+#
+# To get your LoadBalancer IP:
+#   kubectl get svc -n ingress-nginx nginx-ingress-ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+#
+# Or use nip.io for automatic DNS resolution:
+#   Replace ${INGRESS_IP} to worker node IP since we used NodePort for nginx 
+#   spec.ingress.host:mattermost.${INGRESS_IP}.nip.io
+#
+apiVersion: installation.mattermost.com/v1beta1
+kind: Mattermost
+metadata:
+  name: mattermost
+  namespace: mattermost
+spec:
+  version: 11.0.4 # See: https://docs.mattermost.com/product-overview/version-archive.html
+  size: 50users
+  ingress:
+    enabled: true
+    host: mattermost.10.0.0.13.nip.io
+    ingressClass: nginx
+  database:
+    external:
+      secret: mattermost-postgres-connection
+  fileStore:
+    externalVolume:
+      volumeClaimName: mattermost-filestore-pvc
+  scheduling:
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
+      limits:
+        cpu: "2000m"
+        memory: "2Gi"
+  licenseSecret: "mattermost-license"
+  replicas: 1
