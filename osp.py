@@ -79,23 +79,18 @@ Mattermost requires three key components:
 2. **PostgreSQL Database** - for data storage with persistent volumes
 3. **Persistent Storage** - for file uploads and attachments
 
+
 ##### Step 1: Get Kubernetes Cluster Access
 
 ##### Step 2: Install Helm (if not already installed)
 
 ##### Step 3: Install NGINX Ingress Controller
 
-##### Step 4: Deploy PostgreSQL Database
+##### Step 4: Create Mattermost Filestore PV
 
-##### Step 5: Install Mattermost Operator
+##### Step 5: Deploy Mattermost
 
-##### Step 6: Create Database Connection Secret
-
-##### Step 7: Create Mattermost Filestore PVC
-
-##### Step 8: Deploy Mattermost
-
-##### Step 9: Access Mattermost
+##### Step 6: Access Mattermost
 
 #### Deployment Scripts
 - `scripts/01-install-openstack.sh` - Installs and configures OpenStack
@@ -103,8 +98,7 @@ Mattermost requires three key components:
 
 #### Kubernetes Manifests
 The `k8s-manifests/` directory contains:
-- PostgreSQL database deployment with persistent storage
-- Mattermost Operator configuration
+- Mattermost persistent volume configuration
 - Mattermost installation manifests
 - NGINX Ingress configuration templates
 
